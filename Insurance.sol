@@ -3,6 +3,7 @@ pragma solidity ^0.4.19;
 contract MedicalPayment { 
 
     address owner;
+    bool paused;
 
     struct patient {
         bool hasId;
@@ -15,6 +16,11 @@ contract MedicalPayment {
 
     constructor() public {
         owner = msg.sender;
+    }
+
+    function setPaused(bool _paused) public {
+        require(msg.sender == owner, "You are not the owner");
+        paused = _paused;
     }
 
     modifier onlyOwner() {
@@ -38,6 +44,7 @@ contract MedicalPayment {
 
     function makePayment(address _id, uint _amountUsed) public returns (string) {
         require(doctormapping[msg.sender]);
+        require(paused == false, "Contract paused");
         require(patientmapping[_id].amountInsured <= _amountUsed);
         patientmapping[_id].amountInsured -= _amountUsed;
         return "Transaction successful";
